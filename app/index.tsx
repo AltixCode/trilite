@@ -232,7 +232,6 @@ export default function Tools() {
                       borderWidth: pattern === option.id ? 2 : 1,
                       borderColor:
                         pattern === option.id ? colors.accent : colors.border,
-                      opacity: locked ? 0.6 : 1,
                     }}
                   >
                     <Text variant="caption">{name}</Text>
