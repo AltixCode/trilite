@@ -247,7 +247,9 @@ export default function Tools() {
             <View
               style={{
                 marginTop: spacing.lg,
-                height: 340,
+                // Sized from the width it is given rather than a fixed height, so the
+                // magnifier fills a large screen instead of leaving a dead band.
+                aspectRatio: 3 / 4,
                 borderRadius: radius.lg,
                 overflow: "hidden",
                 backgroundColor: colors.surfaceAlt,
