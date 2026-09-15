@@ -115,3 +115,40 @@ jest.mock('expo-router', () => {
     useFocusEffect: (cb) => React.useEffect(() => cb(), []),
   };
 });
+
+// The torch is the camera flash and the magnifier is the camera preview, so the screens need
+// a CameraView to exist. Permission state is what they branch on.
+jest.mock('expo-camera', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const CameraView = (props) => React.createElement(View, props, props.children);
+  CameraView.displayName = 'CameraView';
+  return {
+    CameraView,
+    useCameraPermissions: () => [{ granted: true, canAskAgain: true }, jest.fn()],
+  };
+});
+
+// The accelerometer has no meaning in a test runner. The angle maths is covered exhaustively
+// in src/logic against known vectors, which is where the correctness actually lives.
+jest.mock('expo-sensors', () => {
+  // The listener is kept so a test can emit a known sample: the calibrate path legitimately
+  // refuses to run without a reading, so without this the paywall branch is unreachable.
+  const listeners = [];
+  return {
+    Accelerometer: {
+      setUpdateInterval: jest.fn(),
+      addListener: jest.fn((fn) => {
+        listeners.push(fn);
+        return {
+          remove: () => {
+            const i = listeners.indexOf(fn);
+            if (i >= 0) listeners.splice(i, 1);
+          },
+        };
+      }),
+      /** Test-only: push a sample to every current listener. */
+      __emit: (sample) => listeners.forEach((fn) => fn(sample)),
+    },
+  };
+});

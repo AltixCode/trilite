@@ -10,6 +10,7 @@ import { isRTLLanguage, t } from '@/i18n';
 import { bootstrapAds } from '@/monetization/ads';
 import { shouldShowAds } from '@/monetization/entitlements';
 import { preloadInterstitial } from '@/monetization/interstitial';
+import { useToolStore } from "@/store/useToolStore";
 import { usePremiumStore } from '@/store/usePremiumStore';
 import { ThemeProvider, useTheme } from '@/theme';
 
@@ -26,11 +27,14 @@ function RootNavigator() {
   const isPremium = usePremiumStore((s) => s.isPremium);
   const isReady = usePremiumStore((s) => s.isReady);
   const initialize = usePremiumStore((s) => s.initialize);
+  const hydrateTools = useToolStore((s) => s.hydrate);
 
   useEffect(() => {
     void initialize();
+    // Restores the saved surface calibrations and which tool was last open.
+    void hydrateTools();
     void SplashScreen.hideAsync();
-  }, [initialize]);
+  }, [initialize, hydrateTools]);
 
   useEffect(() => {
     // Ads bootstrap (and the iOS tracking prompt) is deferred until we know the user is not
