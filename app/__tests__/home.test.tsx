@@ -83,9 +83,26 @@ describe('the magnifier', () => {
 });
 
 describe('the level', () => {
-  it('starts at zero and reports not level only once it has a reading', async () => {
+  // The name of this test was already the correct contract; its assertions
+  // were not. It checked for "Pitch 0.0deg" before any sample had arrived,
+  // which is exactly what the screen should NOT say -- alongside a headline
+  // reading "Not level", it made a measurement claim the app had no basis for.
+  it('claims nothing before it has a reading', async () => {
+    useToolStore.setState({ tool: 'level' });
+    const { getByText, queryByText } = await renderWithProviders(<Home />);
+    expect(getByText(t('noReadingLabel'))).toBeTruthy();
+    expect(queryByText(t('notLevelLabel'))).toBeNull();
+    expect(getByText(`${t('pitchLabel')} \u2014`)).toBeTruthy();
+    expect(getByText(`${t('rollLabel')} \u2014`)).toBeTruthy();
+  });
+
+  it('reports on the surface once a sample arrives', async () => {
     useToolStore.setState({ tool: 'level' });
     const { getByText } = await renderWithProviders(<Home />);
+    await act(async () => {
+      // Flat on its back: gravity straight down the z axis.
+      (Accelerometer as unknown as { __emit: (s: object) => void }).__emit({ x: 0, y: 0, z: -1 });
+    });
     expect(getByText(`${t('pitchLabel')} 0.0°`)).toBeTruthy();
     expect(getByText(`${t('rollLabel')} 0.0°`)).toBeTruthy();
   });

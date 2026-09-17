@@ -150,7 +150,7 @@ export default function Tools() {
       {/* topInset, because this route sets headerShown:false -- with no
           navigation header above it, nothing else pays the notch, and the
           title renders underneath the status bar. */}
-      <Screen scroll topInset>
+      <Screen scroll topInset contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[styles.chips, { gap: spacing.sm }]}>
           {TOOLS.map((option) => (
             <Pressable
@@ -320,22 +320,40 @@ export default function Tools() {
           </>
         ) : null}
 
+        {/* The level is a fixed block -- a headline, two numbers, a name
+            field and the saved surfaces -- and on a 13" iPad it sat under
+            the tool chips with more than half the display empty beneath it.
+            Centred in the space between the chips and the settings button,
+            which is a no-op on a phone where the block already fills it.
+            Not applied to the torch or the magnifier: those are a camera
+            view that should use the room it is given. */}
         {tool === "level" ? (
-          <>
+          <View style={{ flex: 1, justifyContent: "center" }}>
             <View style={{ alignItems: "center", marginTop: spacing.xl }}>
+              {/* Three states, not two. No accelerometer sample yet is not the
+                  same as "not level", and the screen was asserting the latter
+                  while printing Pitch 0.0 / Roll 0.0 beneath it -- a flat
+                  contradiction, and a claim the app had no basis for. A tool
+                  whose whole job is to tell you whether something is level
+                  must not guess when it does not know. Reproduced on a
+                  simulator, which has no accelerometer at all, and it is the
+                  same state on a device for the moment before the first
+                  sample arrives. */}
               <Text
                 variant="display"
                 tone={corrected && isLevel(corrected) ? "accent" : "default"}
               >
-                {corrected && isLevel(corrected)
-                  ? t("isLevelLabel")
-                  : t("notLevelLabel")}
+                {!corrected
+                  ? t("noReadingLabel")
+                  : isLevel(corrected)
+                    ? t("isLevelLabel")
+                    : t("notLevelLabel")}
               </Text>
               <Text variant="numeric" style={{ marginTop: spacing.md }}>
-                {`${t("pitchLabel")} ${formatAngle(corrected?.pitch ?? 0)}°`}
+                {`${t("pitchLabel")} ${corrected ? `${formatAngle(corrected.pitch)}°` : "—"}`}
               </Text>
               <Text variant="numeric">
-                {`${t("rollLabel")} ${formatAngle(corrected?.roll ?? 0)}°`}
+                {`${t("rollLabel")} ${corrected ? `${formatAngle(corrected.roll)}°` : "—"}`}
               </Text>
             </View>
 
@@ -413,7 +431,7 @@ export default function Tools() {
                 </Pressable>
               ))}
             </View>
-          </>
+          </View>
         ) : null}
 
         <Button
