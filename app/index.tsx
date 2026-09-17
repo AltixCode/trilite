@@ -3,7 +3,14 @@ import * as Haptics from "expo-haptics";
 import { Accelerometer } from "expo-sensors";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 
 import { BannerAdSlot } from "@/components/BannerAdSlot";
 import { Button, Screen, Text } from "@/components/ui";
@@ -144,6 +151,8 @@ export default function Tools() {
   }, [angles, surfaceName, saveSurface, isPremium, offerUnlock]);
 
   const needsCamera = tool !== "level" && !permission?.granted;
+  // The magnifier and the level work on an iPad; the torch cannot.
+  const hasTorch = !(Platform.OS === "ios" && Platform.isPad);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -194,7 +203,28 @@ export default function Tools() {
           </View>
         ) : null}
 
-        {tool === "torch" && !needsCamera ? (
+        {/* No iPad has ever shipped a rear flash, and the torch IS the flash
+            unit. `enableTorch` on a device without one is simply ignored by
+            expo-camera: the camera mounts, the button says "Torch on", the user
+            taps it, and nothing happens, with nothing on screen to explain why.
+            The app already ships `torchUnavailable` in all fourteen locales --
+            it was translated and then never rendered anywhere. This is the
+            condition it describes. The strobe patterns go with it, because a
+            pattern for a torch that cannot light is not a feature. */}
+        {tool === "torch" && !needsCamera && !hasTorch ? (
+          <View style={{ marginTop: spacing.xl }}>
+            <Text variant="bodyStrong">{t("torchUnavailable")}</Text>
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ marginTop: spacing.xs }}
+            >
+              {t("tagline")}
+            </Text>
+          </View>
+        ) : null}
+
+        {tool === "torch" && !needsCamera && hasTorch ? (
           <>
             {/* The torch is the camera's flash unit, so a camera has to be mounted for it to
                 exist at all. It is kept off-screen and no frame is read. */}

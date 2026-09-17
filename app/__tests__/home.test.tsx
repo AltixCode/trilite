@@ -1,6 +1,6 @@
 import { act, fireEvent } from '@testing-library/react-native';
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 
 import Home from '../index';
@@ -140,5 +140,37 @@ describe('navigation', () => {
     const { getByText } = await renderWithProviders(<Home />);
     await fireEvent.press(getByText(t('settingsTitle')));
     expect(testRouter.push).toHaveBeenCalledWith('/settings');
+  });
+});
+
+describe('a device with no torch', () => {
+  /**
+   * No iPad has a rear flash, and the torch IS the flash unit. `enableTorch`
+   * on such a device is silently ignored by expo-camera: the camera mounts,
+   * the button reads "Torch on", the user taps it, and nothing happens with
+   * nothing on screen to say why.
+   *
+   * The app already shipped `torchUnavailable` in all fourteen locales. It was
+   * translated and then never rendered anywhere -- this is the condition it
+   * describes, and these two tests are what make it reachable.
+   */
+  afterEach(() => {
+    Object.defineProperty(Platform, 'isPad', { value: false, configurable: true });
+  });
+
+  it('says so instead of offering a torch that cannot light', async () => {
+    Object.defineProperty(Platform, 'isPad', { value: true, configurable: true });
+    const { getByText, queryByText } = await renderWithProviders(<Home />);
+
+    expect(getByText(t('torchUnavailable'))).toBeTruthy();
+    expect(queryByText(t('torchOn'))).toBeNull();
+  });
+
+  it('still offers the torch where there is one', async () => {
+    Object.defineProperty(Platform, 'isPad', { value: false, configurable: true });
+    const { getByText, queryByText } = await renderWithProviders(<Home />);
+
+    expect(getByText(t('torchOn'))).toBeTruthy();
+    expect(queryByText(t('torchUnavailable'))).toBeNull();
   });
 });
