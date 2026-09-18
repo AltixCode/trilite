@@ -86,23 +86,7 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: 'com.altixcode.trilite',
     buildNumber: BUILD,
-    // iPhone only, and the app's own name is the reason.
-    //
-    // Trilite is "Torch, magnifier, level". No iPad has ever shipped a rear
-    // flash, so the headline feature is absent on every one of them -- the
-    // torch tab now says so out loud rather than offering a button that does
-    // nothing, which is honest but is not a product. The magnifier and the
-    // level would work; two thirds of a three-tool app is not worth Apple
-    // reviewing an iPad build whose first tool cannot run.
-    //
-    // It also unblocks submission. Declaring iPad support obliges a 13" iPad
-    // screenshot set, and those cannot be captured here: the magnifier needs
-    // a camera and the level needs an accelerometer, neither of which a
-    // simulator has. This app was one of two waiting on physical hardware.
-    //
-    // Reversible: set this back to true, capture on a real iPad, and add the
-    // set. Nothing else depends on it.
-    supportsTablet: false,
+    supportsTablet: true,
     requireFullScreen: false,
     config: {
       // No custom crypto beyond standard HTTPS — declaring this skips the yearly
@@ -172,19 +156,17 @@ const config: ExpoConfig = {
           minSdkVersion: 24,
           // Two architectures, not Expo's default four.
           //
-          // x86 and x86_64 are emulator targets -- nothing in the Play device
-          // population runs them. Building all four compiles every native
-          // module four times over, and the peak memory that produces is what
-          // killed the Gradle daemon on the CI runner: mergewit, multitick,
-          // poursort, ratherly and rectap all died at the same step with
-          // `DaemonDisappearedException`, which reads as a crash rather than as
-          // the out-of-memory kill it actually is.
+          // The default is ['armeabi-v7a','arm64-v8a','x86','x86_64'], and x86
+          // and x86_64 are emulator targets — no phone or tablet in the Play
+          // device population runs them. Building them compiled four native
+          // targets (the app, expo-modules-core, gesture-handler, reanimated)
+          // four times over: fifty-minute Android builds, and a Gradle daemon
+          // killed for memory on a 7 GB runner.
           //
-          // The template has carried this for a while; no generated app had it,
-          // which is why the whole portfolio failed the same way at once.
-          //
-          // The cost is that the app cannot install on x86 Android -- some
-          // Chromebooks and a few uncommon tablets. Reversible in one line.
+          // Halving the work halves the peak memory, which is what the kernel
+          // was objecting to. The cost is that the app cannot install on x86
+          // Android — some Chromebooks and a few uncommon tablets. Reversible
+          // in one line, and nothing has shipped to Play.
           buildArchs: ['arm64-v8a', 'armeabi-v7a'],
         },
       },
