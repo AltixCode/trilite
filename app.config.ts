@@ -86,7 +86,23 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: 'com.altixcode.trilite',
     buildNumber: BUILD,
-    supportsTablet: true,
+    // iPhone only, and the app's own name is the reason.
+    //
+    // Trilite is "Torch, magnifier, level". No iPad has ever shipped a rear
+    // flash, so the headline feature is absent on every one of them -- the
+    // torch tab now says so out loud rather than offering a button that does
+    // nothing, which is honest but is not a product. The magnifier and the
+    // level would work; two thirds of a three-tool app is not worth Apple
+    // reviewing an iPad build whose first tool cannot run.
+    //
+    // It also unblocks submission. Declaring iPad support obliges a 13" iPad
+    // screenshot set, and those cannot be captured here: the magnifier needs
+    // a camera and the level needs an accelerometer, neither of which a
+    // simulator has. This app was one of two waiting on physical hardware.
+    //
+    // Reversible: set this back to true, capture on a real iPad, and add the
+    // set. Nothing else depends on it.
+    supportsTablet: false,
     requireFullScreen: false,
     config: {
       // No custom crypto beyond standard HTTPS — declaring this skips the yearly
