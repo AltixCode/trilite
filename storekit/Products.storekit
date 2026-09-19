@@ -1,0 +1,35 @@
+{
+  "identifier": "07955BE9-CFBD-484B-9652-8A481E056467",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "1F06E7FA-764D-4929-8800-CA36E9C1EC8A",
+      "localizations": [
+        {
+          "description": "trilite remove ads lifetime unlock",
+          "displayName": "trilite remove ads",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.altixcode.trilite.removeads",
+      "referenceName": "trilite remove ads",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

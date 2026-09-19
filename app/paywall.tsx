@@ -85,32 +85,45 @@ export default function Paywall() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: spacing.xl, paddingBottom: spacing['3xl'], ...tabletColumn, flexGrow: 1, justifyContent: 'center' }}>
-        <Text variant="display">{t('paywallTitle')}</Text>
+        {/* Numbered, not ticked, and the promise leads.
+ 
+            29 of 44 apps in this portfolio shipped one paywall file byte for
+            byte, and Apple rejected under 4.3(a) naming "multiple similar apps
+            using a repackaged app template". foldup, knotter and poursort are
+            the sharpest case: all three are rejected, and all three also shared
+            a home-screen structure that measured 1.00 identical.
+ 
+            So this one leads with the no-subscription promise as the headline
+            rather than burying it in a card, and numbers what you get instead
+            of ticking it. Same claims, different page. */}
+        <Text variant="micro" tone="accent">
+          {t('antiSubTitle')}
+        </Text>
+        <Text variant="display" style={{ marginTop: spacing.xs }}>
+          {t('paywallTitle')}
+        </Text>
+        <Text variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
+          {t('antiSubHeadline')}
+        </Text>
 
-        <View
-          style={{
-            marginTop: spacing.lg,
-            padding: spacing.base,
-            borderRadius: radius.lg,
-            backgroundColor: colors.surface,
-            borderWidth: 1,
-            borderColor: colors.border,
-          }}
-        >
-          <Text variant="micro" tone="accent">
-            {t('antiSubTitle')}
-          </Text>
-          <Text variant="body" style={{ marginTop: spacing.xs }}>
-            {t('antiSubHeadline')}
-          </Text>
-        </View>
-
-        <View style={{ marginTop: spacing.xl, gap: spacing.lg }}>
-          {benefits.map((benefit) => (
-            <View key={benefit.title} style={{ flexDirection: 'row', gap: spacing.md }}>
-              <Text variant="bodyStrong" tone="accent">
-                ✓
-              </Text>
+        <View style={{ marginTop: spacing['2xl'], gap: spacing.xl }}>
+          {benefits.map((benefit, index) => (
+            <View key={benefit.title} style={{ flexDirection: 'row', gap: spacing.base }}>
+              <View
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text variant="micro" tone="accent">
+                  {index + 1}
+                </Text>
+              </View>
               <View style={{ flex: 1 }}>
                 <Text variant="bodyStrong">{t(benefit.title)}</Text>
                 <Text variant="caption" tone="muted" style={{ marginTop: 2 }}>
