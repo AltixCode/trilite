@@ -133,9 +133,9 @@ export default function Paywall() {
 
       <ScrollView
         contentContainerStyle={{
+          paddingTop: spacing.sm,
           paddingBottom: spacing["3xl"],
           flexGrow: 1,
-          justifyContent: "center",
         }}
       >
         {/* Paired hero cards, not a flat list.
