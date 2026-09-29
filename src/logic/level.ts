@@ -85,6 +85,40 @@ export function isLevel(angles: Angles, tolerance = LEVEL_TOLERANCE): boolean {
   );
 }
 
+export interface Direction {
+  /**
+   * Degrees clockwise from "up" on screen -- 0 up, 90 right, 180 down, 270
+   * left -- so a UI can rotate an arrow icon (drawn pointing up) with a plain
+   * `rotate: ${bearing}deg` and get the right direction with no further
+   * translation. Meaningless when `magnitude` is 0.
+   */
+  bearing: number;
+  /** Degrees of combined tilt off level. 0 exactly at (0, 0). */
+  magnitude: number;
+}
+
+/**
+ * Which way to tilt the phone to bring it level.
+ *
+ * Positive pitch means the top edge is lifted, so levelling it means bringing
+ * the top down -- bearing 180. Positive roll means the right edge is lifted,
+ * so levelling it means bringing the right down, which is levelling the left
+ * *up* -- bearing 270. The two combine the same way a joystick's x/y do: the
+ * bearing is simply the angle of the vector `(-roll, -pitch)`, the direction
+ * that shortens both errors to zero at once, so a corner case (both axes off)
+ * points between the two cardinal directions rather than snapping to one.
+ */
+export function directionToLevel(angles: Angles): Direction {
+  const { pitch, roll } = angles;
+  const magnitude = Math.hypot(pitch, roll);
+  if (magnitude < 1e-9) return { bearing: 0, magnitude: 0 };
+
+  const dx = -roll;
+  const dy = -pitch;
+  const bearing = (toDegrees(Math.atan2(dx, dy)) + 360) % 360;
+  return { bearing, magnitude };
+}
+
 /**
  * Smooths a noisy sensor.
  *

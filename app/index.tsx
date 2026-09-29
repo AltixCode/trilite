@@ -1,3 +1,4 @@
+import Feather from "@expo/vector-icons/Feather";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { Accelerometer } from "expo-sensors";
@@ -20,6 +21,7 @@ import {
   anglesFrom,
   applyCalibration,
   calibrationFrom,
+  directionToLevel,
   formatAngle,
   isLevel,
   smooth,
@@ -76,7 +78,9 @@ export default function Tools() {
   // Derived, not stored: the pattern is read from elapsed time, so a dropped tick cannot
   // leave the sequence out of step with itself.
   const lit =
-    startedAt === null ? false : isLitAt(patternById(pattern), Math.max(0, now - startedAt));
+    startedAt === null
+      ? false
+      : isLitAt(patternById(pattern), Math.max(0, now - startedAt));
 
   const toggleTorch = useCallback(() => {
     setTorchOn((on) => {
@@ -379,6 +383,32 @@ export default function Tools() {
                     ? t("isLevelLabel")
                     : t("notLevelLabel")}
               </Text>
+
+              {/* Which way to move the phone, not just how far off it is.
+                  The two numbers below say "not level" but leave the user
+                  guessing at the correction; the arrow points the direction
+                  that brings both pitch and roll to zero at once. Hidden
+                  once level -- the direction becomes meaningless (and would
+                  jitter) the moment the tolerance is met. */}
+              {corrected && !isLevel(corrected) ? (
+                <View
+                  style={{ marginTop: spacing.md }}
+                  accessible
+                  accessibilityLabel={t("tiltThisWay")}
+                >
+                  <Feather
+                    name="arrow-up"
+                    size={32}
+                    color={colors.accent}
+                    style={{
+                      transform: [
+                        { rotate: `${directionToLevel(corrected).bearing}deg` },
+                      ],
+                    }}
+                  />
+                </View>
+              ) : null}
+
               <Text variant="numeric" style={{ marginTop: spacing.md }}>
                 {`${t("pitchLabel")} ${corrected ? `${formatAngle(corrected.pitch)}°` : "—"}`}
               </Text>
